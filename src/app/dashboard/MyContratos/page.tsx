@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     FileText,
@@ -53,28 +53,58 @@ const MOCK_CONTRATOS = [
 
 export default function MyContratos() {
     const router = useRouter();
-    const [contratos, setContratos] = useState(MOCK_CONTRATOS);
+    const [contratos, setContratos] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedContrato, setSelectedContrato] = useState<any>(null);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-    // --- LÓGICA DE FILTRAGEM (Nome, Data, Valor e Status) ---
+    // --- BUSCA DE DADOS ---
+    useEffect(() => {
+        async function fetchContratos() {
+            try {
+                const response = await fetch("/api/contratos");
+                if (response.ok) {
+                    const data = await response.json();
+                    setContratos(data);
+                }
+            } catch (error) {
+                console.error("Error fetching contracts:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchContratos();
+    }, []);
+
+    // --- LÓGICA DE FILTRAGEM ---
     const filteredContratos = useMemo(() => {
         const lowerTerm = searchTerm.toLowerCase();
         return contratos.filter((c) =>
             c.titulo.toLowerCase().includes(lowerTerm) ||
             c.contratante.toLowerCase().includes(lowerTerm) ||
-            c.data.includes(lowerTerm) ||
+            (c.data && c.data.includes(lowerTerm)) ||
+            (c.createdAt && new Date(c.createdAt).toLocaleDateString().includes(lowerTerm)) ||
             c.valorTotal.toLowerCase().includes(lowerTerm) ||
             c.status.toLowerCase().includes(lowerTerm)
         );
     }, [searchTerm, contratos]);
 
-    const handleDelete = () => {
-        setContratos(contratos.filter(c => c.id !== selectedContrato.id));
-        setIsDeleteOpen(false);
-        setSelectedContrato(null);
+    const handleDelete = async () => {
+        if (!selectedContrato) return;
+        try {
+            const response = await fetch(`/api/contratos/${selectedContrato.id}`, {
+                method: "DELETE",
+            });
+            if (response.ok) {
+                setContratos(contratos.filter(c => c.id !== selectedContrato.id));
+                setIsDeleteOpen(false);
+                setSelectedContrato(null);
+            }
+        } catch (error) {
+            console.error("Error deleting contract:", error);
+        }
     };
 
     return (

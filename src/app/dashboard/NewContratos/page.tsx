@@ -269,7 +269,25 @@ export default function NewContratoPage(initialData: any, isEditing: boolean = f
             <style>{`@media print { body * { visibility: hidden; } #contrato-impressao, #contrato-impressao * { visibility: visible; } #contrato-impressao { position: absolute; left: 0; top: 0; width: 100%; } }`}</style>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit((d) => console.log(d))} className="space-y-8">
+                <form onSubmit={form.handleSubmit(async (data) => {
+                    try {
+                        const response = await fetch("/api/contratos", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(data),
+                        });
+
+                        if (response.ok) {
+                            router.push("/dashboard/MyContratos");
+                        } else {
+                            console.error("Failed to save contract");
+                        }
+                    } catch (error) {
+                        console.error("Error saving contract:", error);
+                    }
+                })} className="space-y-8">
                     <motion.div variants={containerVariants} initial="hidden" animate="visible">
                         <Card className="border-none shadow-2xl overflow-hidden rounded-[2.5rem] bg-white text-slate-900">
                             <CardHeader className="bg-slate-950 p-10 text-white flex flex-row items-center justify-between">
