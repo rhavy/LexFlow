@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+// TODO: O componente Toaster precisa ser instalado via shadcn-ui.
+// A instalação está falhando no momento. Depois de instalar, descomente as linhas abaixo.
+// import { Toaster } from "@/components/ui/toaster"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,6 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        {/* <Toaster /> */}
       </body>
     </html>
   );

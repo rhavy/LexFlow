@@ -27,7 +27,14 @@ const menuItems = [
     { icon: Settings, label: "Configurações", href: "/dashboard/configuracoes" },
 ];
 
-export function SidebarDashboard() {
+type User = {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+};
+
+export function SidebarDashboard({ user }: { user: User }) {
     const [isOpen, setIsOpen] = useState(true);
     const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
@@ -65,7 +72,7 @@ export function SidebarDashboard() {
                         </div>
                         {isOpen && (
                             <div className="flex flex-col">
-                                <span className="text-xs font-bold text-slate-900 leading-none">Usuário LexFlow</span>
+                                <span className="text-xs font-bold text-slate-900 leading-none">Bem-vindo {user.name}</span>
                                 <span className="text-[10px] text-slate-500 uppercase font-black">Plano Pro</span>
                             </div>
                         )}

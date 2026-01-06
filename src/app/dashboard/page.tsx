@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Users, Clock, Plus, ArrowUpRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Router from "next/router";
+import { FileText, Users, Clock, ArrowUpRight } from "lucide-react";
+import { authClient } from "@/lib/auth-client"; // Importe o seu cliente de autenticação
 
 export default function Dashboard() {
-    // Configurações de animação
+    // 1. Pegamos a sessão no lado do cliente
+    const { data: session } = authClient.useSession();
+
     const containerVariants = {
         hidden: { opacity: 0 },
         show: {
@@ -38,13 +39,11 @@ export default function Dashboard() {
             >
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Painel de Controle</h1>
-                    <p className="text-slate-500">Bem-vindo de volta, LexFlow.</p>
+                    {/* 2. Verificação de segurança para o nome */}
+                    <p className="text-slate-500">
+                        Bem-vindo de volta, <span className="font-semibold text-slate-900">{session?.user?.name || "Advogado"}</span>.
+                    </p>
                 </div>
-                {/* <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200" onClick={() => Router.push("/dashboard/contratos")}>
-                        <Plus className="mr-2 h-4 w-4" /> Novo Contrato
-                    </Button>
-                </motion.div> */}
             </motion.div>
 
             {/* Grid de Stats Animada */}
